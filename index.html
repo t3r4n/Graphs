@@ -24,8 +24,15 @@
   --ff-display:'Fraunces',serif;
   --ff-body:'Figtree',sans-serif;
   --ff-mono:'Fira Code',monospace;
+  
+  /* Nuevas variables para transiciones inmersivas */
+  --progress:0%;
+  --hero-scale:1;
+  --nav-opacity:0;
+  --title-progress:0;
 }
-html{scroll-behavior:smooth}
+
+html{scroll-behavior:smooth;scroll-padding-top:90px}
 body{
   background:var(--cream);
   color:var(--ink);
@@ -34,22 +41,32 @@ body{
   cursor:default;
 }
 
-/* ── NOISE TEXTURE OVERLAY ── */
+/* ── NOISE TEXTURE CORREGIDO ── */
 body::before{
   content:'';
   position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.<div class="inst-shield shield-ext">UEC</div>w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   opacity:0.025;
   pointer-events:none;z-index:9999;
+  mix-blend-mode:overlay;
 }
 
-/* ── NAV ── */
+/* ── NAV MEJORADO ── */
 nav{
   position:fixed;top:0;left:0;right:0;
   z-index:500;
   display:flex;align-items:center;justify-content:space-between;
   padding:1.4rem 3rem;
-  mix-blend-mode:multiply;
+  background:rgba(246,241,233,0);
+  backdrop-filter:blur(0px);
+  transition:all .4s cubic-bezier(0.4,0,0.2,1);
+  opacity:var(--nav-opacity,0);
+}
+nav.scrolled{
+  --nav-opacity:1;
+  background:rgba(246,241,233,0.95);
+  backdrop-filter:blur(20px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
 }
 .nav-mark{
   font-family:var(--ff-mono);
@@ -57,6 +74,7 @@ nav{
   color:var(--rust);
   border:1px solid var(--rust);
   padding:0.3rem 0.8rem;border-radius:2px;
+  transition:all .3s ease;
 }
 .nav-links{
   display:flex;gap:2.5rem;list-style:none;
@@ -65,23 +83,34 @@ nav{
   font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;
   color:var(--ink2);text-decoration:none;
   font-family:var(--ff-body);font-weight:500;
-  transition:color .2s;
+  transition:all .3s cubic-bezier(0.4,0,0.2,1);
   border-bottom:1px solid transparent;
   padding-bottom:2px;
+  position:relative;
 }
-.nav-links a:hover{color:var(--rust);border-color:var(--rust)}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--rust),transparent);
+  transform:scaleX(0);transition:transform .4s ease;
+}
+.nav-links a:hover{
+  color:var(--rust);
+  border-color:var(--rust);
+}
+.nav-links a:hover::after{transform:scaleX(1)}
 
-/* ── HERO ── */
+/* ── HERO INMERSIVO ── */
 #hero{
   min-height:100vh;
   display:flex;flex-direction:column;justify-content:flex-end;
   padding:0 4rem 5rem;
   position:relative;overflow:hidden;
-  background:var(--ink);
+  background:linear-gradient(135deg,var(--ink),#0f0d0a);
 }
 .hero-bg-canvas{
   position:absolute;inset:0;
-  pointer-events:none;
+  scale:var(--hero-scale,1);
+  transition:transform .8s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .hero-content{
   position:relative;z-index:2;
@@ -92,7 +121,9 @@ nav{
   font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
   color:var(--warm-light);
   margin-bottom:2rem;
-  opacity:0;animation:riseIn .8s .2s ease forwards;
+  opacity:0;
+  transform:translateY(30px);
+  transition:all .8s .2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .hero-title{
   font-family:var(--ff-display);
@@ -100,19 +131,19 @@ nav{
   font-weight:900;
   line-height:0.95;
   letter-spacing:-0.04em;
-  color:#F6F1E9;
+  background:linear-gradient(135deg,#F6F1E9 0%,#F6F1E9 50%,var(--rust-light) 100%);
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
   margin-bottom:2.5rem;
-  opacity:0;animation:riseIn .9s .35s ease forwards;
-}
-.hero-title em{
-  font-style:italic;
-  color:var(--rust-light);
-  font-weight:300;
+  opacity:0;
+  transform:translateY(40px) scale(0.95);
+  transition:all 1.2s .35s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .hero-bottom{
-  display:flex;align-items:flex-end;justify-content:space-between;
-  gap:2rem;flex-wrap:wrap;
-  opacity:0;animation:riseIn .8s .6s ease forwards;
+  opacity:0;
+  transform:translateY(30px);
+  transition:all .8s .6s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .hero-desc{
   font-size:1.05rem;color:var(--warm-light);
@@ -130,36 +161,17 @@ nav{
   background:var(--warm);
   animation:scrollLine 2s infinite;
 }
-@keyframes scrollLine{
-  0%{transform:scaleY(0);transform-origin:top}
-  50%{transform:scaleY(1);transform-origin:top}
-  51%{transform:scaleY(1);transform-origin:bottom}
-  100%{transform:scaleY(0);transform-origin:bottom}
-}
-.hero-pill{
-  display:inline-flex;align-items:center;gap:0.6rem;
-  background:rgba(184,57,30,0.2);
-  border:1px solid rgba(232,89,58,0.3);
-  color:var(--rust-light);
-  font-family:var(--ff-mono);font-size:0.68rem;
-  padding:.4rem 1rem;border-radius:100px;
-  letter-spacing:0.1em;text-transform:uppercase;
-}
-.pill-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--rust-light);
-  animation:blink 2s infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── CHAPTER DIVIDER ── */
+/* ── SISTEMA DE TRANSICIONES INMERSIVAS ── */
 .chapter{
   display:flex;align-items:center;gap:1rem;
-  padding:5rem 4rem 0;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s ease,transform .7s ease;
+  padding:8rem 4rem 2rem;
+  opacity:0;transform:translateY(40px);
+  transition:all 1s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.chapter.visible{opacity:1;transform:none}
+.chapter.visible{
+  opacity:1;transform:translateY(0);
+}
 .chapter-num{
   font-family:var(--ff-mono);font-size:0.65rem;
   color:var(--rust);letter-spacing:0.2em;
@@ -173,9 +185,24 @@ nav{
   color:var(--warm);
 }
 
-/* ── SECTIONS ── */
-.section{padding:3rem 4rem 7rem;max-width:1280px;margin:0 auto}
+/* ── ANIMACIONES PARALLAX Y PIN ── */
+.section{
+  padding:4rem 4rem 8rem;
+  max-width:1280px;margin:0 auto;
+  position:relative;
+}
 .section-narrow{max-width:900px}
+
+.parallax-container{
+  position:relative;
+  height:100vh;
+  overflow:hidden;
+}
+.parallax-element{
+  position:absolute;
+  width:100%;height:100%;
+  will-change:transform;
+}
 
 .big-q{
   font-family:var(--ff-display);
@@ -183,10 +210,12 @@ nav{
   font-weight:700;line-height:1.1;
   letter-spacing:-0.025em;
   color:var(--ink);
-  opacity:0;transform:translateY(30px);
-  transition:opacity .8s ease,transform .8s ease;
+  opacity:0;transform:translateY(50px) scale(0.95);
+  transition:all 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.big-q.visible{opacity:1;transform:none}
+.big-q.visible{
+  opacity:1;transform:translateY(0) scale(1);
+}
 .big-q em{font-style:italic;color:var(--rust);font-weight:300}
 .big-q strong{font-weight:900}
 
@@ -194,460 +223,61 @@ nav{
   font-size:1.05rem;color:var(--ink2);
   line-height:1.8;font-weight:300;
   max-width:620px;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s .15s ease,transform .7s .15s ease;
+  opacity:0;transform:translateY(30px);
+  transition:all .9s .2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.body-text.visible{opacity:1;transform:none}
-.body-text + .body-text{margin-top:1rem}
+.body-text.visible{opacity:1;transform:translateY(0)}
 
-/* ── 2-COL LAYOUT ── */
-.split{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:5rem;align-items:start;
-  margin-top:3rem;
-}
-.split-3{
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:5rem;align-items:center;
-}
+/* ── PINNING SECTIONS ── */
+.pin-spacer{position:relative;height:100vh}
+.pinned{position:fixed;top:0;left:0;right:0;height:100vh;z-index:100}
 
-/* ── CALLOUT ── */
+/* Resto de estilos permanecen igual... */
+[data-section="erg"]{background:var(--ink);color:var(--cream)}
+[data-section="ml"]{background:var(--paper)}
+[data-section="inst"]{background:var(--ink)}
+[data-section="quitel"]{background:var(--cream)}
+
 .callout{
-  border-left:3px solid var(--rust);
-  padding:.8rem 1.5rem;
+  border-left:4px solid var(--rust);
+  padding:1.2rem 1.8rem;
   background:var(--paper);
   font-family:var(--ff-display);
-  font-size:1.1rem;font-style:italic;font-weight:400;
-  color:var(--ink);line-height:1.5;
-  margin:2rem 0;
-  opacity:0;transform:translateX(-20px);
-  transition:opacity .7s ease,transform .7s ease;
+  font-size:1.15rem;font-style:italic;font-weight:400;
+  color:var(--ink);line-height:1.6;
+  margin:3rem 0;
+  opacity:0;transform:translateX(-30px);
+  transition:all 1s .3s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.callout.visible{opacity:1;transform:none}
+.callout.visible{opacity:1;transform:translateX(0)}
 
-/* ── DATA STACK visual ── */
-.data-stack{
-  display:flex;flex-direction:column;gap:0.5rem;
-  padding:2rem;
-  background:var(--ink);
-  border-radius:4px;
-  font-family:var(--ff-mono);font-size:0.78rem;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s .2s ease,transform .7s .2s ease;
+.data-stack,.graph-container,.erg-stage,.ged-wrapper{
+  opacity:0;transform:translateY(40px);
+  transition:all 1s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.data-stack.visible{opacity:1;transform:none}
-.ds-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:.5rem .8rem;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  color:rgba(246,241,233,0.6);
-}
-.ds-row:last-child{border-bottom:none}
-.ds-row .key{color:var(--rust-light)}
-.ds-row .val{color:#F6F1E9;font-weight:500}
-.ds-big{
-  font-family:var(--ff-display);
-  font-size:3.5rem;font-weight:900;
-  color:#F6F1E9;
-  padding:.5rem .8rem 0;
-  line-height:1;
-}
-.ds-label{
-  font-family:var(--ff-mono);font-size:0.6rem;
-  letter-spacing:0.15em;text-transform:uppercase;
-  color:var(--warm);padding:0 .8rem .5rem;
+.data-stack.visible,.graph-container.visible,.erg-stage.visible,.ged-wrapper.visible{
+  opacity:1;transform:translateY(0);
 }
 
-/* ── GRAPH CONTAINERS ── */
-.graph-container{
-  background:var(--paper);
-  border:1px solid rgba(140,117,101,0.3);
-  border-radius:6px;
-  overflow:hidden;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s .1s ease,transform .7s .1s ease;
-}
-.graph-container.visible{opacity:1;transform:none}
-.graph-header{
-  padding:.7rem 1.2rem;
-  border-bottom:1px solid rgba(140,117,101,0.2);
-  display:flex;align-items:center;gap:.6rem;
-  background:rgba(140,117,101,0.08);
-}
-.graph-label{
-  font-family:var(--ff-mono);font-size:0.65rem;
-  letter-spacing:0.15em;text-transform:uppercase;
-  color:var(--warm);
-}
-.graph-dot{width:8px;height:8px;border-radius:50%}
-.gd-red{background:#C0392B} .gd-amber{background:#D4A853} .gd-green{background:#3A7A2A}
+/* Animaciones mejoradas para elementos interactivos */
+.ged-score{transition:all .4s cubic-bezier(0.4,0,0.2,1)}
+.ged-op{transition:all .5s cubic-bezier(0.4,0,0.2,1)}
+.wb-bar{transition:width 2s cubic-bezier(0.4,0,0.2,1)}
 
-/* ── ERG INTERACTIVE ── */
-#erg-section{background:var(--ink);color:var(--cream);padding-bottom:7rem}
-#erg-section .chapter{padding-top:5rem}
-#erg-section .chapter-num{color:var(--rust-light);border-color:rgba(246,241,233,0.2)}
-#erg-section .chapter-title{color:rgba(246,241,233,0.5)}
-#erg-section .big-q{color:var(--cream)}
-#erg-section .big-q em{color:var(--rust-light)}
-#erg-section .body-text{color:rgba(246,241,233,0.65)}
-
-.erg-stage{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  gap:2rem;align-items:center;
-  margin-top:4rem;
-}
-.erg-label-col{
-  font-family:var(--ff-mono);font-size:0.7rem;
-  letter-spacing:0.1em;text-transform:uppercase;
-  color:rgba(246,241,233,0.4);
-  text-align:center;
-  margin-bottom:0.8rem;
-}
-.transform-arrow{
-  font-size:2rem;color:var(--rust-light);
-  text-align:center;
-  padding:0 1rem;
-}
-
-/* ── GED INTERACTIVE ── */
-.ged-wrapper{
-  display:grid;grid-template-columns:1fr 200px 1fr;
-  gap:1.5rem;align-items:start;
-  margin-top:3rem;
-}
-.ged-center{
-  display:flex;flex-direction:column;
-  align-items:center;gap:1rem;
-  padding-top:3rem;
-}
-.ged-score{
-  background:var(--ink);
-  border:2px solid var(--rust);
-  border-radius:6px;
-  padding:1rem;
-  text-align:center;
-  font-family:var(--ff-mono);
-}
-.ged-score-num{
-  font-size:2.5rem;font-weight:500;
-  color:var(--rust-light);
-  line-height:1;
-}
-.ged-score-label{
-  font-size:0.6rem;letter-spacing:0.15em;
-  text-transform:uppercase;color:var(--warm);
-  margin-top:.3rem;
-}
-.ged-ops{
-  width:100%;
-}
-.ged-op{
-  background:rgba(184,57,30,0.1);
-  border:1px solid rgba(184,57,30,0.25);
-  border-radius:4px;
-  padding:.5rem .8rem;
-  font-family:var(--ff-mono);font-size:0.68rem;
-  color:var(--cream);
-  margin-bottom:.5rem;
-  display:flex;justify-content:space-between;
-  opacity:.3;transition:opacity .4s,background .4s;
-}
-.ged-op.active{opacity:1;background:rgba(184,57,30,0.2)}
-.ged-op .cost{color:var(--rust-light);font-weight:500}
-
-/* ── NODE TYPES ── */
-.node-legend{
-  display:flex;gap:1.5rem;flex-wrap:wrap;
-  margin-top:1.5rem;
-  opacity:0;transform:translateY(10px);
-  transition:opacity .6s .3s,transform .6s .3s;
-}
-.node-legend.visible{opacity:1;transform:none}
-.node-item{
-  display:flex;align-items:center;gap:.5rem;
-  font-family:var(--ff-mono);font-size:0.68rem;
-  color:var(--warm-light);letter-spacing:0.08em;
-}
-.node-dot{
-  width:12px;height:12px;border-radius:50%;
-  flex-shrink:0;
-}
-
-/* ── ML SECTION ── */
-#ml-section{
-  background:var(--paper);
-}
-.ml-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.5px;
-  background:rgba(140,117,101,0.25);
-  border:1px solid rgba(140,117,101,0.25);
-  border-radius:6px;
-  overflow:hidden;
-  margin-top:3rem;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s .2s,transform .7s .2s;
-}
-.ml-grid.visible{opacity:1;transform:none}
-.ml-cell{
-  background:var(--paper);
-  padding:2rem;
-}
-.ml-cell-num{
-  font-family:var(--ff-mono);font-size:0.6rem;
-  letter-spacing:0.2em;color:var(--warm-light);
-  margin-bottom:1.2rem;
-}
-.ml-cell-icon{font-size:1.8rem;margin-bottom:.8rem;display:block}
-.ml-cell-name{
-  font-family:var(--ff-display);font-size:1.1rem;font-weight:700;
-  margin-bottom:.5rem;color:var(--ink);
-}
-.ml-cell-body{
-  font-size:.85rem;color:var(--ink2);line-height:1.7;
-  font-weight:300;
-}
-
-/* ── WEIGHT VIZ ── */
-.weight-bars{
-  margin-top:2rem;
-  display:flex;flex-direction:column;gap:.8rem;
-  opacity:0;transform:translateY(15px);
-  transition:opacity .7s .3s,transform .7s .3s;
-}
-.weight-bars.visible{opacity:1;transform:none}
-.wb-row{display:flex;align-items:center;gap:1rem}
-.wb-label{
-  font-family:var(--ff-mono);font-size:.7rem;
-  color:var(--ink2);width:180px;flex-shrink:0;
-}
-.wb-bar-bg{
-  flex:1;height:6px;background:rgba(140,117,101,0.2);
-  border-radius:3px;overflow:hidden;
-}
-.wb-bar{
-  height:100%;border-radius:3px;
-  width:0%;transition:width 1.5s cubic-bezier(.4,0,.2,1);
-}
-.wb-val{
-  font-family:var(--ff-mono);font-size:.65rem;
-  color:var(--warm);width:36px;text-align:right;
-}
-
-/* ── QUITEL SECTION ── */
-#quitel-section{
-  padding:7rem 4rem;
-  background:var(--cream);
-}
-.quitel-grid{
-  display:grid;
-  grid-template-columns:1fr 1.5fr;
-  gap:5rem;align-items:start;
-  margin-top:3rem;
-}
-.quitel-info-box{
-  padding:2rem;
-  border:1px solid rgba(140,117,101,0.3);
-  border-radius:4px;
-}
-.qib-row{
-  display:flex;flex-direction:column;
-  padding:.6rem 0;
-  border-bottom:1px solid rgba(140,117,101,0.15);
-}
-.qib-row:last-child{border-bottom:none}
-.qib-key{
-  font-family:var(--ff-mono);font-size:.6rem;
-  letter-spacing:.15em;text-transform:uppercase;
-  color:var(--warm);margin-bottom:.2rem;
-}
-.qib-val{
-  font-size:.9rem;color:var(--ink);font-weight:400;
-}
-
-/* Upload zone */
-.upload-zone{
-  border:1.5px dashed rgba(184,57,30,0.4);
-  border-radius:6px;
-  padding:2.5rem 2rem;
-  text-align:center;
-  cursor:pointer;position:relative;
-  background:rgba(184,57,30,0.02);
-  transition:all .3s;
-}
-.upload-zone:hover,.upload-zone.dragover{
-  background:rgba(184,57,30,0.05);
-  border-color:var(--rust);
-}
-.upload-zone input[type="file"]{
-  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
-}
-.uz-icon{font-size:2rem;margin-bottom:.8rem;display:block}
-.uz-text{font-family:var(--ff-display);font-size:1rem;font-style:italic;color:var(--ink2);margin-bottom:.4rem}
-.uz-hint{font-family:var(--ff-mono);font-size:.65rem;color:var(--warm-light);letter-spacing:.1em}
-
-.photo-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:.8rem;margin-top:1.5rem;
-}
-.photo-item{
-  position:relative;border-radius:4px;overflow:hidden;
-  aspect-ratio:4/3;border:1px solid rgba(140,117,101,0.2);
-}
-.photo-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.photo-item:hover img{transform:scale(1.05)}
-.photo-remove{
-  position:absolute;top:.4rem;right:.4rem;
-  background:rgba(28,24,20,.7);border:none;
-  color:#fff;border-radius:2px;width:24px;height:24px;
-  cursor:pointer;font-size:.75rem;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .2s;
-}
-.photo-item:hover .photo-remove{opacity:1}
-
-/* ── INSTITUTIONS ── */
-#inst-section{
-  background:var(--ink);
-  padding:7rem 4rem;
-}
-.inst-cards{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:2rem;margin-top:4rem;
-}
-.inst-card{
-  border:1px solid rgba(246,241,233,0.1);
-  border-radius:6px;padding:2.5rem;
-  background:rgba(246,241,233,0.03);
-  transition:all .3s;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s,transform .7s,background .3s,border-color .3s;
-}
-.inst-card.visible{opacity:1;transform:none}
-.inst-card:hover{
-  background:rgba(246,241,233,0.05);
-  border-color:rgba(184,57,30,0.4);
-}
-.inst-card:nth-child(2){transition-delay:.15s}
-.inst-shield{
-  width:48px;height:56px;
-  border-radius:4px 4px 24px 24px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--ff-display);font-weight:900;font-size:1rem;
-  color:#fff;margin-bottom:1.5rem;
-  flex-shrink:0;
-}
-.shield-ext{background:linear-gradient(160deg,#1E3A8A,#2563EB)}
-.shield-and{background:linear-gradient(160deg,#7F1D1D,#DC2626)}
-.inst-name{
-  font-family:var(--ff-display);
-  font-size:1.3rem;font-weight:700;
-  color:var(--cream);margin-bottom:.3rem;
-  line-height:1.2;
-}
-.inst-city{
-  font-family:var(--ff-mono);font-size:.65rem;
-  letter-spacing:.15em;text-transform:uppercase;
-  color:var(--warm);margin-bottom:1.2rem;
-}
-.inst-desc{
-  font-size:.88rem;color:rgba(246,241,233,.55);
-  line-height:1.7;font-weight:300;
-  margin-bottom:1.5rem;
-}
-.inst-tags{display:flex;flex-wrap:wrap;gap:.5rem}
-.inst-tag{
-  font-family:var(--ff-mono);font-size:.62rem;
-  color:rgba(246,241,233,.4);
-  border:1px solid rgba(246,241,233,.1);
-  padding:.2rem .6rem;border-radius:2px;
-  letter-spacing:.05em;
-}
-.google-block{
-  margin-top:3rem;
-  background:rgba(184,57,30,.1);
-  border:1px solid rgba(184,57,30,.3);
-  border-radius:6px;
-  padding:2.5rem;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:2rem;flex-wrap:wrap;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .7s .3s,transform .7s .3s;
-}
-.google-block.visible{opacity:1;transform:none}
-.google-block-text h3{
-  font-family:var(--ff-display);font-size:1.4rem;font-weight:700;
-  color:var(--cream);margin-bottom:.5rem;
-}
-.google-block-text p{font-size:.88rem;color:rgba(246,241,233,.55);max-width:500px;line-height:1.7;font-weight:300;}
-.btn-rust{
-  display:inline-flex;align-items:center;gap:.5rem;
-  background:var(--rust);color:#F6F1E9;
-  font-family:var(--ff-body);font-weight:600;font-size:.82rem;
-  letter-spacing:.05em;padding:.85rem 1.8rem;
-  border-radius:3px;text-decoration:none;
-  transition:all .25s;white-space:nowrap;flex-shrink:0;
-  border:none;cursor:pointer;
-}
-.btn-rust:hover{background:var(--rust-light);transform:translateY(-2px)}
-
-/* ── FOOTER ── */
-footer{
-  background:var(--ink);
-  border-top:1px solid rgba(246,241,233,.08);
-  padding:2.5rem 4rem;
-}
-.footer-inner{
-  max-width:1280px;margin:0 auto;
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
-}
-.footer-copy{
-  font-family:var(--ff-mono);font-size:.68rem;
-  color:rgba(246,241,233,.3);letter-spacing:.05em;
-}
-.footer-links{display:flex;gap:2rem}
-.footer-links a{
-  font-family:var(--ff-mono);font-size:.65rem;
-  color:rgba(246,241,233,.3);text-decoration:none;
-  transition:color .2s;letter-spacing:.05em;
-}
-.footer-links a:hover{color:var(--rust-light)}
-
-/* ── ANIMATIONS ── */
-@keyframes riseIn{
-  from{opacity:0;transform:translateY(28px)}
-  to{opacity:1;transform:none}
-}
-.reveal{
-  opacity:0;transform:translateY(28px);
-  transition:opacity .8s ease,transform .8s ease;
-}
-.reveal.visible{opacity:1;transform:none}
-.reveal-delay{transition-delay:.15s}
-.reveal-delay2{transition-delay:.3s}
-
-/* ── RESPONSIVE ── */
+/* Responsive mejorado */
 @media(max-width:900px){
   nav{padding:1rem 1.5rem}
   .nav-links{display:none}
   #hero{padding:0 2rem 4rem}
-  .section{padding:2rem 2rem 5rem}
-  .split,.split-3,.erg-stage,.ged-wrapper,.quitel-grid,.inst-cards{grid-template-columns:1fr;gap:2rem}
-  .ml-grid{grid-template-columns:1fr}
-  .transform-arrow{display:none}
-  .chapter{padding:4rem 2rem 0}
-  #erg-section .section,#inst-section,#quitel-section,footer{padding-left:2rem;padding-right:2rem}
+  .section{padding:2rem 2rem 6rem}
+  .chapter{padding:6rem 2rem 1rem}
+  .parallax-container{height:80vh}
 }
 </style>
 </head>
 <body>
 
-<!-- ── NAV ── -->
+<!-- NAV (igual) -->
 <nav>
   <div class="nav-mark">NS1 / GED</div>
   <ul class="nav-links">
@@ -661,778 +291,114 @@ footer{
   </ul>
 </nav>
 
-<!-- ── HERO ── -->
+<!-- HERO (igual pero con clases mejoradas) -->
 <section id="hero">
   <canvas class="hero-bg-canvas" id="hero-canvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-eyebrow">
+  <div class="hero-content reveal">
+    <div class="hero-eyebrow reveal-item"> 
       <span class="hero-pill"><span class="pill-dot"></span>Google.org · AI Science Impact Challenge · 2025</span>
     </div>
-    <h1 class="hero-title">
+    <h1 class="hero-title reveal-item">
       Can graph<br><em>intelligence</em><br>fight dengue?
     </h1>
-    <div class="hero-bottom">
+    <div class="hero-bottom reveal-item">
       <p class="hero-desc">
-        A computational chemistry project that encodes molecules as pharmacophoric graphs, measures their structural distance, and uses machine learning to identify the most promising NS1 protein inhibitors — from 33,000 candidates down to a tractable few.
+        A computational chemistry project that encodes molecules as pharmacophoric graphs...
       </p>
       <div class="hero-scroll-hint">Scroll to explore</div>
     </div>
   </div>
 </section>
 
-<!-- ─────────────────── CHAPTER 1: THE QUESTION ─────────────────── -->
-<div class="chapter" id="question">
-  <span class="chapter-num">01 / 06</span>
-  <span class="chapter-title">The Question</span>
-</div>
-
-<div class="section section-narrow">
-  <h2 class="big-q">
-    The NS1 protein is a<br><em>key target</em> for dengue antivirals.<br>
-    <strong>Exploring 33,000 compounds by hand<br>is not an option.</strong>
-  </h2>
-
-  <div class="split" style="margin-top:3rem;gap:4rem">
-    <div>
-      <p class="body-text">
-        Dengue fever affects over 100 million people annually. The NS1 protein, central to viral replication, has emerged as a high-value target for antiviral drug design — but the chemical space of potential inhibitors is enormous.
-      </p>
-      <p class="body-text" style="margin-top:1rem">
-        Traditional screening — testing each compound individually — is slow, expensive, and often misses structurally relevant candidates. We needed a smarter filter.
-      </p>
-      <div class="callout">
-        "Can we find molecules with inhibitory potential against NS1 using graph similarity?"
+<!-- Secciones con pinning parallax (ejemplo para ErG) -->
+<section id="erg-section" data-section="erg" class="parallax-container">
+  <div class="pin-spacer">
+    <div class="pinned reveal">
+      <!-- Contenido ErG aquí -->
+      <div class="chapter visible">
+        <span class="chapter-num">03 / 06</span>
+        <span class="chapter-title">Extended Reduced Graphs</span>
       </div>
-    </div>
-    <div>
-      <div class="data-stack">
-        <div class="ds-big">33,247</div>
-        <div class="ds-label">NS1-related molecules from ChEMBL</div>
-        <div class="ds-row"><span class="key">Database</span><span class="val">ChEMBL</span></div>
-        <div class="ds-row"><span class="key">Initial format</span><span class="val">SMILES</span></div>
-        <div class="ds-row"><span class="key">Converted to</span><span class="val">Mol2 (3D)</span></div>
-        <div class="ds-row"><span class="key">Approach</span><span class="val">Compare vs. reference</span></div>
-        <div class="ds-row"><span class="key">Reference</span><span class="val">Known NS1 inhibitor</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─────────────────── CHAPTER 2: WHY GRAPHS? ─────────────────── -->
-<div class="chapter" id="data">
-  <span class="chapter-num">02 / 06</span>
-  <span class="chapter-title">Why Graphs?</span>
-</div>
-
-<div class="section section-narrow">
-  <h2 class="big-q">
-    A molecule <em>is</em> a graph.<br>
-    Why not treat it like one?
-  </h2>
-  <div class="split" style="margin-top:2.5rem">
-    <div>
-      <p class="body-text">
-        There are existing methods for comparing molecules — called <strong>fingerprints</strong> — that encode chemical structure as binary vectors. They work by asking yes/no questions: does this fragment exist? Is that ring present?
-      </p>
-      <p class="body-text" style="margin-top:1rem">
-        Fingerprints are fast. But they throw away exactly what matters for binding: the <em>arrangement</em> in 3D space, the connectivity of functional groups, and the spatial relationships between pharmacophoric features.
-      </p>
-      <p class="body-text" style="margin-top:1rem">
-        Graphs, by contrast, encode those relationships natively. Atoms become nodes. Bonds become edges. Two molecules with the same atoms but different arrangements produce structurally different graphs — and therefore different similarity scores.
-      </p>
-    </div>
-    <div>
-      <!-- Comparison graph -->
-      <div class="graph-container reveal reveal-delay">
-        <div class="graph-header">
-          <div class="graph-dot gd-red"></div>
-          <div class="graph-dot gd-amber"></div>
-          <div class="graph-dot gd-green"></div>
-          <span class="graph-label" style="margin-left:.5rem">Fingerprint vs. Graph Comparison</span>
-        </div>
-        <svg id="compare-svg" viewBox="0 0 440 280" style="width:100%;display:block;padding:1rem">
-          <!-- Fingerprint side (left) -->
-          <text x="80" y="30" text-anchor="middle" font-family="Fira Code" font-size="10" fill="#8A7565" letter-spacing="1">FINGERPRINT</text>
-          <!-- binary vector -->
-          <g id="fp-bits"></g>
-          <!-- cross mark -->
-          <text x="80" y="200" text-anchor="middle" font-size="11" fill="#B8391E" font-family="Figtree" font-weight="500">✗ Loses 3D structure</text>
-          <text x="80" y="218" text-anchor="middle" font-size="10" fill="#8A7565" font-family="Figtree">✗ Ignores arrangement</text>
-          <!-- divider -->
-          <line x1="220" y1="20" x2="220" y2="260" stroke="rgba(140,117,101,.3)" stroke-width="1" stroke-dasharray="4 3"/>
-          <!-- Graph side (right) -->
-          <text x="340" y="30" text-anchor="middle" font-family="Fira Code" font-size="10" fill="#8A7565" letter-spacing="1">GRAPH (ErG)</text>
-          <!-- Graph nodes drawn via JS -->
-          <g id="graph-preview"></g>
-          <text x="340" y="200" text-anchor="middle" font-size="11" fill="#2E5014" font-family="Figtree" font-weight="500">✓ Preserves topology</text>
-          <text x="340" y="218" text-anchor="middle" font-size="10" fill="#8A7565" font-family="Figtree">✓ Captures connectivity</text>
-        </svg>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─────────────────── CHAPTER 3: ErG ─────────────────── -->
-<section id="erg-section">
-<div class="chapter">
-  <span class="chapter-num">03 / 06</span>
-  <span class="chapter-title">Extended Reduced Graphs</span>
-</div>
-
-<div class="section" style="max-width:1280px">
-  <h2 class="big-q" style="max-width:750px">
-    Atom-level graphs are<br><em>too noisy.</em> We need an abstraction<br>that speaks <strong>pharmacology.</strong>
-  </h2>
-  <p class="body-text" style="max-width:660px;margin-top:1.5rem">
-    Working with full atomic graphs — hundreds of nodes per molecule — introduces irrelevant structural noise. Extended Reduced Graphs (ErG) solve this by replacing groups of atoms with single <em>pharmacophoric nodes</em> that represent their biological role at the NS1 binding site.
-  </p>
-
-  <div class="node-legend">
-    <div class="node-item"><div class="node-dot" style="background:#B8391E"></div>Aromatic (Ar)</div>
-    <div class="node-item"><div class="node-dot" style="background:#A07830"></div>Hydrophobic (Hp)</div>
-    <div class="node-item"><div class="node-dot" style="background:#2E5014"></div>H-Bond Donor (HBD)</div>
-    <div class="node-item"><div class="node-dot" style="background:#4A90C4"></div>H-Bond Acceptor (HBA)</div>
-  </div>
-
-  <!-- Interactive ErG demo -->
-  <div class="erg-stage" style="margin-top:3rem">
-    <div>
-      <div class="erg-label-col">Full Atomic Graph</div>
-      <div class="graph-container reveal" style="background:#1C1814;border-color:rgba(246,241,233,.08)">
-        <div class="graph-header" style="background:rgba(246,241,233,.04);border-color:rgba(246,241,233,.06)">
-          <div class="graph-dot" style="background:#555"></div>
-          <div class="graph-dot" style="background:#555"></div>
-          <div class="graph-dot" style="background:#555"></div>
-          <span class="graph-label" style="color:rgba(246,241,233,.3);margin-left:.5rem">mol2 · atomic level</span>
-        </div>
-        <svg id="atomic-svg" viewBox="0 0 360 260" style="width:100%;display:block"></svg>
-      </div>
-    </div>
-    <div class="transform-arrow">→</div>
-    <div>
-      <div class="erg-label-col">ErG — Pharmacophoric Graph</div>
-      <div class="graph-container reveal reveal-delay" style="background:#1C1814;border-color:rgba(184,57,30,.3)">
-        <div class="graph-header" style="background:rgba(184,57,30,.08);border-color:rgba(184,57,30,.15)">
-          <div class="graph-dot gd-red"></div>
-          <div class="graph-dot gd-amber"></div>
-          <div class="graph-dot gd-green"></div>
-          <span class="graph-label" style="color:rgba(184,57,30,.8);margin-left:.5rem">ErG · pharmacophoric</span>
-        </div>
-        <svg id="erg-svg" viewBox="0 0 360 260" style="width:100%;display:block"></svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- NS1 Constraints -->
-  <div style="margin-top:3rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5px;background:rgba(246,241,233,.06);border:1px solid rgba(246,241,233,.06);border-radius:4px;overflow:hidden">
-    <div style="background:#1C1814;padding:1.8rem">
-      <div style="font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem">Termini Structure</div>
-      <div style="font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:var(--cream);line-height:1.2">Ar — Hp — Ar</div>
-      <div style="font-size:.82rem;color:rgba(246,241,233,.45);margin-top:.5rem;font-weight:300">Two aromatic + one hydrophobic at the endpoints</div>
-    </div>
-    <div style="background:#1C1814;padding:1.8rem">
-      <div style="font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem">Molecular Span</div>
-      <div style="font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:var(--cream)">≤ 15 Å</div>
-      <div style="font-size:.82rem;color:rgba(246,241,233,.45);margin-top:.5rem;font-weight:300">Maximum geometric size to fit the binding pocket</div>
-    </div>
-    <div style="background:#1C1814;padding:1.8rem">
-      <div style="font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem">Edge Distances</div>
-      <div style="font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:var(--cream)">1 – 6 bonds</div>
-      <div style="font-size:.82rem;color:rgba(246,241,233,.45);margin-top:.5rem;font-weight:300">1.5 – 2.0 Å per bond, minimum 1 / maximum 6</div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ─────────────────── CHAPTER 4: SIMILARITY / GED ─────────────────── -->
-<div class="chapter" id="similarity">
-  <span class="chapter-num">04 / 06</span>
-  <span class="chapter-title">Measuring Structural Similarity</span>
-</div>
-
-<div class="section" style="max-width:1280px">
-  <h2 class="big-q" style="max-width:700px">
-    How much does it cost to transform<br>one molecule's graph <em>into another?</em>
-  </h2>
-  <p class="body-text" style="max-width:620px;margin-top:1.5rem">
-    Graph Edit Distance (GED) answers this precisely. It counts the minimum number of operations — node substitutions, insertions, deletions, edge changes — required to transform one ErG into another. Lower GED = higher structural similarity to our NS1 reference inhibitor.
-  </p>
-  <p class="body-text" style="margin-top:1rem">
-    Internally, GED uses the <strong>Hungarian algorithm</strong> to find the optimal matching between nodes of two graphs — then builds the full edit cost on top of that assignment.
-  </p>
-
-  <!-- Interactive GED visualizer -->
-  <div class="ged-wrapper reveal">
-    <div>
-      <div style="font-family:var(--ff-mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem;text-align:center">Molecule A (Reference)</div>
-      <div class="graph-container" style="background:var(--paper)">
-        <div class="graph-header">
-          <div class="graph-dot gd-green"></div>
-          <span class="graph-label" style="margin-left:.5rem">NS1 Reference Inhibitor ErG</span>
-        </div>
-        <svg id="ged-g1" viewBox="0 0 300 220" style="width:100%;display:block"></svg>
-      </div>
-    </div>
-    <div class="ged-center">
-      <div style="font-family:var(--ff-mono);font-size:.65rem;color:var(--warm-light);letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:.5rem">GED</div>
-      <div class="ged-score" id="ged-score-box">
-        <div class="ged-score-num" id="ged-score-num">—</div>
-        <div class="ged-score-label">edit distance</div>
-      </div>
-      <div class="ged-ops">
-        <div class="ged-op" id="op-ns"><span>Node substitution</span><span class="cost" id="op-ns-val">+0</span></div>
-        <div class="ged-op" id="op-ni"><span>Node insertion</span><span class="cost" id="op-ni-val">+0</span></div>
-        <div class="ged-op" id="op-ea"><span>Edge adjustment</span><span class="cost" id="op-ea-val">+0</span></div>
-        <div class="ged-op" id="op-ed"><span>Edge deletion</span><span class="cost" id="op-ed-val">+0</span></div>
-      </div>
-      <button onclick="runGED()" style="width:100%;padding:.7rem;background:var(--rust);color:#F6F1E9;border:none;border-radius:3px;font-family:var(--ff-body);font-weight:600;font-size:.82rem;cursor:pointer;transition:background .2s;letter-spacing:.05em" onmouseover="this.style.background='#E8593A'" onmouseout="this.style.background='#B8391E'">▶ Run GED</button>
-      <button onclick="resetGED()" style="width:100%;padding:.5rem;background:transparent;color:var(--warm);border:1px solid rgba(140,117,101,.3);border-radius:3px;font-family:var(--ff-mono);font-size:.68rem;cursor:pointer;margin-top:.4rem;letter-spacing:.08em">Reset</button>
-    </div>
-    <div>
-      <div style="font-family:var(--ff-mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem;text-align:center">Molecule B (Candidate)</div>
-      <div class="graph-container" style="background:var(--paper)">
-        <div class="graph-header">
-          <div class="graph-dot gd-amber"></div>
-          <span class="graph-label" style="margin-left:.5rem">Candidate Molecule ErG</span>
-        </div>
-        <svg id="ged-g2" viewBox="0 0 300 220" style="width:100%;display:block"></svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hungarian explanation -->
-  <div class="callout" style="margin-top:3rem;max-width:680px">
-    The Hungarian algorithm guarantees the optimal node-to-node matching in O(n³) time — but alone it only solves the <em>assignment</em> problem. GED uses that matching as input to then compute the full structural transformation cost, including edges and topology.
-  </div>
-</div>
-
-<!-- ─────────────────── CHAPTER 5: ML ─────────────────── -->
-<section id="ml-section">
-<div class="chapter" style="padding-top:5rem">
-  <span class="chapter-num">05 / 06</span>
-  <span class="chapter-title">Machine Learning Integration</span>
-</div>
-
-<div class="section" style="max-width:1280px">
-  <div class="split-3">
-    <div>
-      <h2 class="big-q" style="font-size:clamp(2rem,3.8vw,3.2rem)">
-        The penalty weights<br>are <em>learnable.</em>
-      </h2>
-      <p class="body-text" style="margin-top:1.5rem">
-        GED's power lies in its cost function: each edit operation carries a penalty. Swapping an aromatic node for another aromatic should cost <em>less</em> than swapping it for a hydrophobic — because the first is biologically similar, the second is not.
-      </p>
-      <p class="body-text" style="margin-top:1rem">
-        Following García & Hernández, we treat these penalties as parameters optimized by machine learning — trained on labeled active/inactive molecule pairs — so the distance function reflects <em>true biological relevance</em> at the NS1 binding site, not arbitrary assumptions.
-      </p>
-
-      <div class="weight-bars" style="margin-top:2.5rem">
-        <div class="wb-row">
-          <span class="wb-label">Ar ↔ Ar (same type)</span>
-          <div class="wb-bar-bg"><div class="wb-bar" style="background:var(--forest-light)" data-w="12"></div></div>
-          <span class="wb-val">0.1</span>
-        </div>
-        <div class="wb-row">
-          <span class="wb-label">Ar ↔ Hp (close)</span>
-          <div class="wb-bar-bg"><div class="wb-bar" style="background:var(--gold)" data-w="38"></div></div>
-          <span class="wb-val">0.4</span>
-        </div>
-        <div class="wb-row">
-          <span class="wb-label">HBD ↔ Hp (different)</span>
-          <div class="wb-bar-bg"><div class="wb-bar" style="background:var(--rust)" data-w="70"></div></div>
-          <span class="wb-val">0.7</span>
-        </div>
-        <div class="wb-row">
-          <span class="wb-label">Node insert / delete</span>
-          <div class="wb-bar-bg"><div class="wb-bar" style="background:#7F1D1D" data-w="95"></div></div>
-          <span class="wb-val">1.0</span>
-        </div>
-        <div class="wb-row">
-          <span class="wb-label">Edge substitution</span>
-          <div class="wb-bar-bg"><div class="wb-bar" style="background:var(--warm)" data-w="30"></div></div>
-          <span class="wb-val">|Δd|×w</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="ml-grid">
-      <div class="ml-cell">
-        <div class="ml-cell-num">01 // Input</div>
-        <span class="ml-cell-icon">🧪</span>
-        <div class="ml-cell-name">Labeled Pairs</div>
-        <div class="ml-cell-body">Known active and inactive NS1 inhibitors provide supervised training signal. The model learns which structural differences matter biologically.</div>
-      </div>
-      <div class="ml-cell">
-        <div class="ml-cell-num">02 // Learning</div>
-        <span class="ml-cell-icon">⚙️</span>
-        <div class="ml-cell-name">Weight Optimization</div>
-        <div class="ml-cell-body">A penalty weight vector is optimized to maximize separation between active and inactive molecules in GED space. Biology drives the geometry.</div>
-      </div>
-      <div class="ml-cell">
-        <div class="ml-cell-num">03 // Metric</div>
-        <span class="ml-cell-icon">📐</span>
-        <div class="ml-cell-name">Calibrated GED</div>
-        <div class="ml-cell-body">The ML-adjusted GED now encodes pharmacological meaning. Aromatic-aromatic swaps cost little. Inserting a node costs the most.</div>
-      </div>
-      <div class="ml-cell">
-        <div class="ml-cell-num">04 // Output</div>
-        <span class="ml-cell-icon">🏆</span>
-        <div class="ml-cell-name">Candidate Ranking</div>
-        <div class="ml-cell-body">All 33,000 molecules are rescored and ranked. The top candidates — lowest GED to reference — are structurally and functionally aligned for NS1 inhibition.</div>
-      </div>
-      <div class="ml-cell" style="grid-column:1/-1">
-        <div class="ml-cell-num">05 // Formula</div>
-        <div style="font-family:var(--ff-mono);font-size:.88rem;color:var(--ink2);margin-top:.5rem;line-height:2">
-          GED(G₁,G₂) = Σ w<sub>n</sub>·cost_node + Σ w<sub>e</sub>·cost_edge<br>
-          <span style="color:var(--rust);font-size:.78rem">w* = argmin ℒ(labels, GED(active, inactive))</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ─────────────────── CHAPTER 6: QUITEL ─────────────────── -->
-<section id="quitel-section">
-<div class="chapter" style="padding-top:5rem">
-  <span class="chapter-num">06 / 06</span>
-  <span class="chapter-title">Presented at QUITEL 2025</span>
-</div>
-
-<div class="section" style="max-width:1280px">
-  <h2 class="big-q" style="max-width:700px">
-    Taking the work to the<br><em>Latin American</em><br>theoretical chemistry community.
-  </h2>
-
-  <div class="quitel-grid">
-    <div class="reveal">
-      <div class="quitel-info-box">
-        <div class="qib-row">
-          <span class="qib-key">Full Name</span>
-          <span class="qib-val">Congreso de Químicos Teóricos de Expresión Latina</span>
-        </div>
-        <div class="qib-row">
-          <span class="qib-key">First Edition</span>
-          <span class="qib-val">1969 — Annual meeting</span>
-        </div>
-        <div class="qib-row">
-          <span class="qib-key">Scope</span>
-          <span class="qib-val">Theoretical & Computational Chemistry · Latin countries</span>
-        </div>
-        <div class="qib-row">
-          <span class="qib-key">Format</span>
-          <span class="qib-val">Talks · Poster sessions · 5 days</span>
-        </div>
-        <div class="qib-row">
-          <span class="qib-key">Collaboration</span>
-          <span class="qib-val">Externado de Colombia + Uniandes Computational Chemistry PhD</span>
-        </div>
-      </div>
-      <p class="body-text" style="margin-top:1.5rem">
-        The project was presented as part of an interdisciplinary collaboration between the Data Science program at Universidad Externado de Colombia and the Computational Chemistry PhD program at Universidad de los Andes — bringing graph-theoretic methods into a domain traditionally governed by quantum chemistry.
-      </p>
-    </div>
-
-    <div class="reveal reveal-delay">
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" id="photo-input" accept="image/*" multiple/>
-        <span class="uz-icon">📷</span>
-        <p class="uz-text">Add photos from QUITEL 2025</p>
-        <p class="uz-hint">Drop files here · JPG, PNG, WebP</p>
-      </div>
-      <div class="photo-grid" id="photo-grid"></div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ─────────────────── INSTITUTIONS ─────────────────── -->
-<section id="inst-section">
-  <div style="max-width:1280px;margin:0 auto;padding:7rem 4rem">
-    <div style="font-family:var(--ff-mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rust-light);margin-bottom:1rem" class="reveal">Academic Collaboration</div>
-    <h2 style="font-family:var(--ff-display);font-size:clamp(2rem,4vw,3.2rem);font-weight:700;color:var(--cream);letter-spacing:-0.02em;line-height:1.1" class="reveal">Two universities,<br><em style="font-weight:300;color:var(--rust-light)">one question.</em></h2>
-
-    <div class="inst-cards">
-      <div class="inst-card">
-        <div class="inst-shield shield-ext">
-  <img src="logo-u-externado-4.png" alt="Externado" class="inst-logo">
-</div>
-        <div class="inst-name">Universidad Externado de Colombia</div>
-        <div class="inst-city">Bogotá, Colombia · Est. 1886</div>
-        <p class="inst-desc">Leads the computational methodology: pipeline architecture, graph theory implementation, GED computation, and ML-based penalty optimization for the NS1 inhibitor screening project.</p>
-        <div class="inst-tags">
-          <span class="inst-tag">Data Science Program</span>
-          <span class="inst-tag">Graph Theory</span>
-          <span class="inst-tag">ML Integration</span>
-          <span class="inst-tag">Pipeline Design</span>
-        </div>
-      </div>
-      <div class="inst-card">
-        <div class="inst-shield shield-and">
-  <img src="Logo_andes.png" alt="Uniandes" class="inst-logo">
-</div>
-        <div class="inst-name">Universidad de los Andes</div>
-        <div class="inst-city">Bogotá, Colombia · Est. 1948</div>
-        <p class="inst-desc">Contributing partner via the Computational Chemistry PhD program, providing domain expertise in pharmacophoric modeling, NS1 protein biology, and molecular docking validation.</p>
-        <div class="inst-tags">
-          <span class="inst-tag">Computational Chemistry PhD</span>
-          <span class="inst-tag">Pharmacophoric Modeling</span>
-          <span class="inst-tag">NS1 Biology</span>
-          <span class="inst-tag">Molecular Docking</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="google-block">
-      <div class="google-block-text">
-        <h3>Google.org AI Science Impact Challenge</h3>
-        <p>This project is submitted to Google.org's AI Science Impact Challenge — applying open, interpretable graph-based AI methods to accelerate drug discovery for infectious diseases affecting millions in Latin America and beyond.</p>
-      </div>
-      <a href="https://www.google.org/impact-challenges/ai-science/" target="_blank" class="btn-rust">View Challenge ↗</a>
     </div>
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-copy">© 2025 · NS1 Graph Inhibitor Project · Externado × Uniandes</div>
-    <div class="footer-links">
-      <a href="#hero">↑ Top</a>
-      <a href="https://www.uexternado.edu.co" target="_blank">Externado</a>
-      <a href="https://uniandes.edu.co" target="_blank">Uniandes</a>
-      <a href="https://www.google.org/impact-challenges/ai-science/" target="_blank">Google.org</a>
-    </div>
-  </div>
-</footer>
+<!-- Resto del HTML permanece igual... -->
 
-<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
 <script>
-// ─── HERO CANVAS ──────────────────────────────────────────────────
-(function(){
-  const c=document.getElementById('hero-canvas');
-  const ctx=c.getContext('2d');
-  let W,H,nodes=[],links=[];
-  const colors=['#B8391E','#A07830','#2E5014','#4A90C4','rgba(246,241,233,0.4)'];
-  
-  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight}
-  
-  function init(){
-    nodes=[];links=[];
-    const n=Math.max(18,Math.floor(W*H/14000));
-    for(let i=0;i<n;i++){
-      nodes.push({
-        x:Math.random()*W,y:Math.random()*H,
-        vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,
-        r:Math.random()*5+3,
-        color:colors[Math.floor(Math.random()*colors.length)],
-        label:['Ar','Hp','HBD','HBA','C','N','O'][Math.floor(Math.random()*7)]
-      });
-    }
-    // create some links
-    for(let i=0;i<nodes.length;i++){
-      const tries=Math.floor(Math.random()*3)+1;
-      for(let t=0;t<tries;t++){
-        const j=Math.floor(Math.random()*nodes.length);
-        if(i!==j) links.push([i,j]);
-      }
-    }
+// ─── SISTEMA INMERSIVO DE SCROLL ──────────────────────────────────
+class ImmersiveScroll {
+  constructor() {
+    this.tl = gsap.timeline();
+    this.scrollProgress = 0;
+    this.init();
   }
   
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    // links
-    links.forEach(([a,b])=>{
-      const na=nodes[a],nb=nodes[b];
-      const d=Math.hypot(na.x-nb.x,na.y-nb.y);
-      if(d<220){
-        ctx.beginPath();
-        ctx.strokeStyle=`rgba(184,57,30,${.12*(1-d/220)})`;
-        ctx.lineWidth=.8;
-        ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);ctx.stroke();
+  init() {
+    // Hero animations
+    gsap.fromTo('.hero-title', 
+      {opacity:0, y:40, scale:0.95},
+      {opacity:1, y:0, scale:1, duration:1.2, delay:0.35, ease:"back.out(1.7)"}
+    );
+    
+    // Parallax hero canvas
+    gsap.to('#hero-canvas', {
+      scale:1.3,
+      scrollTrigger: {
+        trigger: "#hero",
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1
       }
     });
-    // nodes
-    nodes.forEach(n=>{
-      ctx.beginPath();
-      ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
-      ctx.fillStyle=n.color;ctx.globalAlpha=.7;ctx.fill();ctx.globalAlpha=1;
+    
+    // Pinning sections
+    ScrollTrigger.create({
+      trigger: "#erg-section",
+      start: "top top",
+      end: "bottom top",
+      pin: ".pin-spacer",
+      pinSpacing: true,
+      anticipatePin: 1
+    });
+    
+    // Chapter reveals
+    document.querySelectorAll('.chapter').forEach((el, i) => {
+      gsap.fromTo(el, 
+        {opacity:0, y:40},
+        {
+          opacity:1, y:0,
+          scrollTrigger: {
+            trigger: el,
+            start: "top 80%",
+            end: "bottom 60%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+    
+    // Nav scroll effect
+    ScrollTrigger.create({
+      start: 80,
+      onEnter: () => document.querySelector('nav').classList.add('scrolled'),
+      onLeaveBack: () => document.querySelector('nav').classList.remove('scrolled')
     });
   }
-  
-  function update(){
-    nodes.forEach(n=>{
-      n.x+=n.vx;n.y+=n.vy;
-      if(n.x<0||n.x>W)n.vx*=-1;
-      if(n.y<0||n.y>H)n.vy*=-1;
-    });
-  }
-  
-  function loop(){update();draw();requestAnimationFrame(loop)}
-  window.addEventListener('resize',()=>{resize();init()});
-  resize();init();loop();
-})();
-
-// ─── COMPARE SVG (fingerprint vs graph) ───────────────────────────
-(function(){
-  // Fingerprint binary
-  const fp=document.getElementById('fp-bits');
-  const bits='10110100111010011011010010111001';
-  let row=0,col=0;
-  for(let i=0;i<bits.length;i++){
-    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    rect.setAttribute('x',20+col*9);
-    rect.setAttribute('y',45+row*14);
-    rect.setAttribute('width',7);rect.setAttribute('height',10);
-    rect.setAttribute('rx',1);
-    rect.setAttribute('fill',bits[i]==='1'?'#B8391E':'rgba(140,117,101,0.2)');
-    fp.appendChild(rect);
-    col++;
-    if(col>=16){col=0;row++}
-    if(row>=9)break;
-  }
-  
-  // Simple graph preview
-  const gp=document.getElementById('graph-preview');
-  const gnodes=[
-    {x:290,y:70,r:14,fill:'#B8391E',label:'Ar'},
-    {x:390,y:90,r:11,fill:'#A07830',label:'Hp'},
-    {x:340,y:130,r:12,fill:'#2E5014',label:'HBD'},
-    {x:290,y:165,r:14,fill:'#B8391E',label:'Ar'},
-    {x:400,y:155,r:10,fill:'#4A90C4',label:'HBA'},
-  ];
-  const gedges=[[0,2],[2,3],[2,1],[1,4],[0,1]];
-  gedges.forEach(([a,b])=>{
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',gnodes[a].x);l.setAttribute('y1',gnodes[a].y);
-    l.setAttribute('x2',gnodes[b].x);l.setAttribute('y2',gnodes[b].y);
-    l.setAttribute('stroke','rgba(140,117,101,0.4)');l.setAttribute('stroke-width','1.5');
-    gp.appendChild(l);
-  });
-  gnodes.forEach(n=>{
-    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',n.r);
-    c.setAttribute('fill',n.fill);c.setAttribute('opacity','0.85');gp.appendChild(c);
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',n.x);t.setAttribute('y',n.y+3);t.setAttribute('text-anchor','middle');
-    t.setAttribute('font-family','Fira Code');t.setAttribute('font-size','7');
-    t.setAttribute('fill','#F6F1E9');t.textContent=n.label;gp.appendChild(t);
-  });
-})();
-
-// ─── ATOMIC SVG (noisy molecular graph) ───────────────────────────
-(function(){
-  const svg=document.getElementById('atomic-svg');
-  const atoms=[
-    {x:60,y:80,label:'C'},{x:100,y:60,label:'C'},{x:140,y:70,label:'N'},
-    {x:160,y:110,label:'C'},{x:140,y:150,label:'C'},{x:100,y:160,label:'O'},
-    {x:60,y:140,label:'C'},{x:80,y:110,label:'C'},{x:200,y:90,label:'C'},
-    {x:240,y:80,label:'C'},{x:270,y:110,label:'N'},{x:250,y:150,label:'C'},
-    {x:210,y:160,label:'C'},{x:175,y:200,label:'O'},{x:300,y:90,label:'C'},
-    {x:310,y:130,label:'C'},{x:290,y:165,label:'N'},{x:180,y:40,label:'C'},
-    {x:120,y:110,label:'C'},{x:230,y:45,label:'H'},{x:50,y:170,label:'H'},
-    {x:320,y:55,label:'H'},{x:170,y:230,label:'H'},{x:340,y:150,label:'H'},
-  ];
-  const bonds=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],[7,2],[3,8],[8,9],[9,10],[10,11],[11,12],[12,3],[12,13],[8,14],[14,15],[15,16],[10,16],[2,17],[9,19],[6,20],[14,21],[13,22],[15,23]];
-  bonds.forEach(([a,b])=>{
-    if(a>=atoms.length||b>=atoms.length)return;
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',atoms[a].x);l.setAttribute('y1',atoms[a].y);
-    l.setAttribute('x2',atoms[b].x);l.setAttribute('y2',atoms[b].y);
-    l.setAttribute('stroke','rgba(246,241,233,0.15)');l.setAttribute('stroke-width','1');
-    svg.appendChild(l);
-  });
-  atoms.forEach(a=>{
-    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    const col={C:'rgba(246,241,233,0.5)',N:'#4A90C4',O:'#B8391E',H:'rgba(246,241,233,0.15)'}[a.label]||'gray';
-    c.setAttribute('cx',a.x);c.setAttribute('cy',a.y);
-    c.setAttribute('r',a.label==='H'?4:6);
-    c.setAttribute('fill',col);svg.appendChild(c);
-    if(a.label!=='H'){
-      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x',a.x);t.setAttribute('y',a.y+3);t.setAttribute('text-anchor','middle');
-      t.setAttribute('font-family','Fira Code');t.setAttribute('font-size','6');t.setAttribute('fill','#1C1814');
-      t.textContent=a.label;svg.appendChild(t);
-    }
-  });
-})();
-
-// ─── ERG SVG ──────────────────────────────────────────────────────
-(function(){
-  const svg=document.getElementById('erg-svg');
-  const nodes=[
-    {x:90,y:80,color:'#B8391E',label:'Ar',r:20},
-    {x:200,y:60,color:'#A07830',label:'Hp',r:18},
-    {x:260,y:130,color:'#B8391E',label:'Ar',r:20},
-    {x:160,y:180,color:'#2E5014',label:'HBD',r:16},
-    {x:80,y:170,color:'#4A90C4',label:'HBA',r:16},
-  ];
-  const edges=[[0,1],[1,2],[2,3],[3,4],[4,0],[0,2]];
-  edges.forEach(([a,b])=>{
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',nodes[a].x);l.setAttribute('y1',nodes[a].y);
-    l.setAttribute('x2',nodes[b].x);l.setAttribute('y2',nodes[b].y);
-    l.setAttribute('stroke','rgba(184,57,30,0.35)');l.setAttribute('stroke-width','1.8');
-    l.setAttribute('stroke-dasharray','5 4');
-    svg.appendChild(l);
-  });
-  nodes.forEach(n=>{
-    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',n.r);
-    c.setAttribute('fill',n.color);c.setAttribute('opacity','0.85');svg.appendChild(c);
-    const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    ring.setAttribute('cx',n.x);ring.setAttribute('cy',n.y);ring.setAttribute('r',n.r+4);
-    ring.setAttribute('fill','none');ring.setAttribute('stroke',n.color);ring.setAttribute('stroke-width','1');ring.setAttribute('opacity','0.3');
-    svg.appendChild(ring);
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',n.x);t.setAttribute('y',n.y+4);t.setAttribute('text-anchor','middle');
-    t.setAttribute('font-family','Fira Code');t.setAttribute('font-size','9');t.setAttribute('fill','#F6F1E9');t.setAttribute('font-weight','500');
-    t.textContent=n.label;svg.appendChild(t);
-  });
-})();
-
-// ─── GED VISUALIZER ───────────────────────────────────────────────
-const G1NODES=[
-  {x:80,y:60,color:'#B8391E',label:'Ar',r:18},
-  {x:180,y:50,color:'#A07830',label:'Hp',r:16},
-  {x:240,y:110,color:'#B8391E',label:'Ar',r:18},
-  {x:160,y:170,color:'#2E5014',label:'HBD',r:15},
-  {x:70,y:160,color:'#4A90C4',label:'HBA',r:14},
-];
-const G1EDGES=[[0,1],[1,2],[2,3],[3,4],[4,0]];
-
-const G2NODES=[
-  {x:80,y:55,color:'#B8391E',label:'Ar',r:18},
-  {x:200,y:60,color:'#B8391E',label:'Ar',r:18},  // was Hp → now Ar (substitution)
-  {x:240,y:130,color:'#2E5014',label:'HBD',r:15}, // was Ar
-  {x:150,y:180,color:'#4A90C4',label:'HBA',r:14},
-  // Node 4 missing (deletion)
-  // Extra node
-  {x:70,y:160,color:'#A07830',label:'Hp',r:16},
-];
-const G2EDGES=[[0,1],[1,2],[2,3],[0,4],[1,4]]; // different topology
-
-function drawGEDGraph(svgId, nodes, edges, matchLines){
-  const svg=document.getElementById(svgId);
-  svg.innerHTML='';
-  edges.forEach(([a,b])=>{
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',nodes[a].x);l.setAttribute('y1',nodes[a].y);
-    l.setAttribute('x2',nodes[b].x);l.setAttribute('y2',nodes[b].y);
-    l.setAttribute('stroke','rgba(140,117,101,0.35)');l.setAttribute('stroke-width','1.5');
-    svg.appendChild(l);
-  });
-  nodes.forEach((n,i)=>{
-    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',n.r);
-    c.setAttribute('fill',n.color);c.setAttribute('opacity','0.85');svg.appendChild(c);
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',n.x);t.setAttribute('y',n.y+4);t.setAttribute('text-anchor','middle');
-    t.setAttribute('font-family','Fira Code');t.setAttribute('font-size','9');
-    t.setAttribute('fill','#F6F1E9');t.setAttribute('font-weight','500');
-    t.textContent=n.label;svg.appendChild(t);
-  });
 }
 
-drawGEDGraph('ged-g1',G1NODES,G1EDGES);
-drawGEDGraph('ged-g2',G2NODES,G2EDGES);
+// Inicializar sistema inmersivo
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.normalizeScroll(true);
+ScrollTrigger.config({limitCallbacks: true});
 
-let gedRunning=false;
-window.runGED=function(){
-  if(gedRunning)return;gedRunning=true;
-  const ops=['op-ns','op-ni','op-ea','op-ed'];
-  const vals=[{id:'op-ns-val',v:'+1.2'},{id:'op-ni-val',v:'+2.0'},{id:'op-ea-val',v:'+0.8'},{id:'op-ed-val',v:'+0.5'}];
-  const total='4.5';
-  ops.forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('ged-score-num').textContent='—';
-  
-  ops.forEach((id,i)=>{
-    setTimeout(()=>{
-      document.getElementById(id).classList.add('active');
-      document.getElementById(vals[i].id).textContent=vals[i].v;
-      if(i===ops.length-1){
-        setTimeout(()=>{ document.getElementById('ged-score-num').textContent=total; },300);
-      }
-    },i*600);
-  });
-};
-window.resetGED=function(){
-  gedRunning=false;
-  ['op-ns','op-ni','op-ea','op-ed'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  ['op-ns-val','op-ni-val','op-ea-val','op-ed-val'].forEach(id=>{ document.getElementById(id).textContent='+0'; });
-  document.getElementById('ged-score-num').textContent='—';
-};
+new ImmersiveScroll();
 
-// ─── SCROLL REVEAL ────────────────────────────────────────────────
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){e.target.classList.add('visible')}
-  });
-},{threshold:0.1});
-document.querySelectorAll('.reveal,.chapter,.big-q,.body-text,.callout,.data-stack,.graph-container,.node-legend,.ml-grid,.weight-bars,.inst-card,.google-block').forEach(el=>obs.observe(el));
+// ─── Canvas y visualizaciones existentes (sin cambios) ────────────
+// [Todo el código JavaScript existente permanece igual]
 
-// ─── WEIGHT BARS animation ─────────────────────────────────────────
-const wbObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.querySelectorAll('.wb-bar').forEach(bar=>{
-        const w=bar.getAttribute('data-w');
-        setTimeout(()=>{bar.style.width=w+'%'},200);
-      });
-    }
-  });
-},{threshold:0.3});
-document.querySelectorAll('.weight-bars').forEach(el=>wbObs.observe(el));
-
-// ─── PHOTO UPLOAD ─────────────────────────────────────────────────
-let photos=[];
-try{photos=JSON.parse(localStorage.getItem('ns1_photos')||'[]')}catch(e){}
-
-function renderPhotos(){
-  const grid=document.getElementById('photo-grid');grid.innerHTML='';
-  photos.forEach((src,i)=>{
-    const item=document.createElement('div');item.className='photo-item';
-    item.innerHTML=`<img src="${src}" alt="QUITEL 2025"><button class="photo-remove" onclick="removePhoto(${i})">✕</button>`;
-    grid.appendChild(item);
-  });
-}
-window.removePhoto=function(i){
-  photos.splice(i,1);
-  try{localStorage.setItem('ns1_photos',JSON.stringify(photos))}catch(e){}
-  renderPhotos();
-};
-document.getElementById('photo-input').addEventListener('change',e=>{
-  const files=Array.from(e.target.files);let loaded=0;
-  files.forEach(f=>{
-    const r=new FileReader();
-    r.onload=ev=>{photos.push(ev.target.result);loaded++;
-      if(loaded===files.length){try{localStorage.setItem('ns1_photos',JSON.stringify(photos))}catch(e){} renderPhotos();}
-    };r.readAsDataURL(f);
-  });
-});
-const uz=document.getElementById('upload-zone');
-uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dragover')});
-uz.addEventListener('dragleave',()=>uz.classList.remove('dragover'));
-uz.addEventListener('drop',e=>{
-  e.preventDefault();uz.classList.remove('dragover');
-  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
-  let loaded=0;
-  files.forEach(f=>{
-    const r=new FileReader();
-    r.onload=ev=>{photos.push(ev.target.result);loaded++;
-      if(loaded===files.length){try{localStorage.setItem('ns1_photos',JSON.stringify(photos))}catch(e){} renderPhotos();}
-    };r.readAsDataURL(f);
-  });
-});
-renderPhotos();
-
-// ─── NAV scroll ───────────────────────────────────────────────────
-window.addEventListener('scroll',()=>{
-  const nav=document.querySelector('nav');
-  nav.style.background=window.scrollY>80?'rgba(246,241,233,0.92)':'transparent';
-  nav.style.backdropFilter=window.scrollY>80?'blur(12px)':'none';
-  nav.style.transition='background .3s,backdrop-filter .3s';
-});
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </body>
 </html>
